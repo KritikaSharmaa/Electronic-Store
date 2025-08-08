@@ -1,0 +1,11 @@
+#.dockerignore only affects what gets sent to the Docker build context when you run:
+.git        # Prevents your entire Git history from being sent to Docker
+*.log       #Avoids shipping log files into the image
+*.tmp       # Skips temp files
+Dockerfile*     # Prevents the Dockerfile(s) from being copied into the image accidentally
+README*     # Skips README docs (not needed in container)
+*.class      # Excludes compiled Java class files (Spring Boot jar already contains them)
+.DS_Store       # Mac OS finder metadata files — useless in container
+node_modules    # Heavy node_modules folders (if you had frontend code here)
+.idea           #.idea/ folder (IntelliJ configs) is in your project root
+.mvn/

@@ -1,0 +1,57 @@
+#Docker Compose lets you define and run multi-container Docker apps with a single YAML file (docker-compose.yml). You describe services, networks, and volumes in it.
+
+#However, this just for knowledge not deploying my project using dockerfile as docker use to run multiple containers parallely, which praticed in case where I deployed both springboot app and sql db in same ec2 - perfect for that case
+
+#In this project will run manual container cmd to work as only one container need to be created
+
+version: '3.8'
+
+services:
+  estore_sqldb:
+    image: mysql:8.0
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+    container_name: estore_sqldb
+    environment:
+      MYSQL_ROOT_PASSWORD: Kritika@22
+      MYSQL_DATABASE: electronic_store
+    ports:
+      - "3308:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-pKritika@22" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - store-network
+
+  electronic_store:
+    #build: .  ==> only when you're building the Docker image locally from a Dockerfile
+    image: kritikasharma2212/electronic_store1.0
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+    container_name: electronic_store
+    depends_on:
+      estore_sqldb:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: estore_sqldb
+      MYSQL_PORT: 3306
+    ports:
+      - "9090:9090"
+    networks:
+      - store-network
+
+networks:
+  store-network:
+
+volumes:
+  db_data:
